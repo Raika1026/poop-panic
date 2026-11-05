@@ -32,6 +32,14 @@ let dogRestPeriod = 120;
 
 let dogState = "walk";
 
+let willPoop = true;
+let poops = [];
+let hasPooped = false;
+
+//ウンチ君とプレイヤーの距離
+let distance;
+
+
 //プレイヤーの描画処理
 function drawPlayer(){
     ctx.fillStyle = "blue";
@@ -60,21 +68,41 @@ document.addEventListener("keydown", function(event){
 
 document.addEventListener("keyup", function(event){
     keys[event.key] = false;
+    if(event.key === " "){
+        poops.forEach(function(poop, index){
+            if(isNearPoop(poop)){
+                poop.cleanCount ++;
+            }
+            if(poop.cleanCount >= 3){
+                poops.splice(index, 1)
+            }
+        })
+    }
 });
+
+//うんちくんの描画処理
+function drawPoops(){
+    poops.forEach(function(poop){
+        ctx.beginPath();
+        ctx.arc(poop.x + 25, poop.y + 25, 10, 0, Math.PI*2);
+        ctx.fillStyle = "brown";
+        ctx.fill();
+    })
+}
 
 //プレイヤーの座標更新
 function updatePlayer(){
     if(keys["ArrowRight"]){
-        playerX += 1.5;
+        playerX += 2;
     }
     if(keys["ArrowLeft"]){
-        playerX -= 1.5;
+        playerX -= 2;
     }
     if(keys["ArrowDown"]){
-        playerY += 1.5;
+        playerY += 2;
     }
     if(keys["ArrowUp"]){
-        playerY -= 1.5;
+        playerY -= 2;
     }
 
     playerX = Math.max(0, Math.min(playerX, canvas.width - 50));
@@ -124,6 +152,11 @@ function updateDog(){
 
         if(dogTimer >= dogPeriod){
             dogState = "rest";
+            hasPooped = false;
+            willPoop = Math.random() < 0.8;
+
+            dogAnimationFrame = 0;
+            dogAnimationTimer = 0;
             dogTimer = 0;
             dogDirection = Math.floor(Math.random() * 4);
             dogPeriod = Math.floor(Math.random() * 180 + 120);
@@ -132,6 +165,14 @@ function updateDog(){
     
     if(dogState === "rest"){
         dogRestTimer ++;
+        if(willPoop && !hasPooped){
+            poops.push({
+                x: dogX,
+                y:dogY,
+                cleanCount:0
+            });
+            hasPooped = true;
+        }
         if(dogRestTimer >= dogRestPeriod){
             dogState = "walk";
             dogRestTimer = 0;
@@ -140,13 +181,29 @@ function updateDog(){
     }
 }
 
+function isNearPoop(poop){
+    distance = Math.sqrt(
+        (poop.x + 25 - (playerX + 25))**2 + (poop.y + 25 - (playerY + 25))**2
+    );
+    return distance <= 50;
+}
+
 function gameLoop(){
     updatePlayer();
     updateDog();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawPlayer();
     drawDog();
-    requestAnimationFrame(gameLoop);
+    drawPoops();
+
+    poops.forEach(function(poop){
+        if(isNearPoop(poop)){
+        console.log("うんちくんの近くにいる！")
+        };
+    });
+
+    requestAnimationFrame(gameLoop);    
 }
 
 gameLoop();
+

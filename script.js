@@ -39,6 +39,10 @@ let hasPooped = false;
 //ウンチ君とプレイヤーの距離
 let distance;
 
+let dirtiness = 0;
+
+let isGameOver = false;
+
 
 //プレイヤーの描画処理
 function drawPlayer(){
@@ -90,6 +94,20 @@ function drawPoops(){
     })
 }
 
+//汚れゲージの描画処理
+function drawDirtiness(){
+    ctx.fillStyle = "gray";
+    ctx.fillRect(20, 20, 200, 15);
+    ctx.fillStyle = "brown";
+    ctx.fillRect(20, 20, 200*dirtiness/100, 15);
+}
+
+function drawGameOver(){
+    ctx.fillStyle = "red";
+    ctx.font = "50px sans-serif"
+    ctx.fillText("GAME OVER", 240, 200);
+}
+
 //プレイヤーの座標更新
 function updatePlayer(){
     if(keys["ArrowRight"]){
@@ -113,16 +131,16 @@ function updatePlayer(){
 function updateDog(){
     if(dogState === "walk"){
         if(dogDirection === 0){
-        dogX += 2;
+        dogX += 3;
         }
         if(dogDirection === 1){
-            dogX -= 2;
+            dogX -= 3;
         }
         if(dogDirection === 2){
-            dogY -= 2;
+            dogY -= 3;
         }
         if(dogDirection === 3){
-            dogY += 2;
+            dogY += 3;
         }
    
 
@@ -189,18 +207,23 @@ function isNearPoop(poop){
 }
 
 function gameLoop(){
+    if(isGameOver){
+        drawGameOver();
+        return;
+    }
+    
     updatePlayer();
     updateDog();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawPlayer();
     drawDog();
     drawPoops();
+    drawDirtiness();
 
-    poops.forEach(function(poop){
-        if(isNearPoop(poop)){
-        console.log("うんちくんの近くにいる！")
-        };
-    });
+    dirtiness += poops.length / 30;
+    if(dirtiness >= 100){
+        isGameOver = true;
+    }
 
     requestAnimationFrame(gameLoop);    
 }

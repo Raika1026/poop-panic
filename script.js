@@ -102,6 +102,12 @@ function drawDirtiness(){
     ctx.fillRect(20, 20, 200*dirtiness/100, 15);
 }
 
+function drawGameOver(){
+    ctx.fillStyle = "red";
+    ctx.font = "50px sans-serif"
+    ctx.fillText("GAME OVER", 240, 200);
+}
+
 //プレイヤーの座標更新
 function updatePlayer(){
     if(keys["ArrowRight"]){
@@ -202,6 +208,7 @@ function isNearPoop(poop){
 
 function gameLoop(){
     if(isGameOver){
+        drawGameOver();
         return;
     }
     
@@ -213,7 +220,7 @@ function gameLoop(){
     drawPoops();
     drawDirtiness();
 
-    dirtiness += poops.length / 60;
+    dirtiness += poops.length / 30;
     if(dirtiness >= 100){
         isGameOver = true;
     }

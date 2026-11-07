@@ -94,6 +94,7 @@ document.addEventListener("keyup", function(event){
 //リスタートボタンの処理
 restartButton.addEventListener("click", function(){
     restartGame();
+    restartButton.blur();
 })
 
 ///スタートボタンの処理

@@ -2,10 +2,10 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 const dogImage1 = new Image();
-dogImage1.src = "images/menchi_left_walk1.png";
+dogImage1.src = "images/menchi_left_walk1.PNG";
 
 const dogImage2 = new Image();
-dogImage2.src = "images/menchi_left_walk2.png";
+dogImage2.src = "images/menchi_left_walk2.PNG";
 
 ///画像を切り替えるまでの時間
 let dogAnimationTimer = 0;

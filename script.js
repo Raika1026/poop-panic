@@ -1,6 +1,9 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+const restartButton = document.getElementById("restartButton");
+const startButton = document.getElementById("startButton");
+
 const dogImage1 = new Image();
 dogImage1.src = "images/menchi_left_walk1.PNG";
 
@@ -42,6 +45,10 @@ let distance;
 let dirtiness = 0;
 
 let isGameOver = false;
+let elapsedTime = 0;
+
+let animationId;
+let isGameStarted = false;
 
 
 //プレイヤーの描画処理
@@ -84,6 +91,18 @@ document.addEventListener("keyup", function(event){
     }
 });
 
+//リスタートボタンの処理
+restartButton.addEventListener("click", function(){
+    restartGame();
+})
+
+///スタートボタンの処理
+startButton.addEventListener("click", function(){
+    isGameStarted = true;
+    startButton.style.display = "none";
+    animationId = requestAnimationFrame(gameLoop);
+})
+
 //うんちくんの描画処理
 function drawPoops(){
     poops.forEach(function(poop){
@@ -105,7 +124,19 @@ function drawDirtiness(){
 function drawGameOver(){
     ctx.fillStyle = "red";
     ctx.font = "50px sans-serif"
-    ctx.fillText("GAME OVER", 240, 200);
+    ctx.fillText("GAME OVER", 190, 200);
+}
+
+function drawElapsedTime(){
+    ctx.fillStyle = "black";
+    ctx.font = "30px sans-serif";
+    ctx.fillText("経過時間：" + Math.floor(elapsedTime) + "秒", 350, 35);
+}
+
+function drawResult(){
+    ctx.fillStyle = "orange";
+    ctx.font = "40px sans-serif";
+    ctx.fillText("生存時間：" + Math.floor(elapsedTime) + "秒", 190, 300);
 }
 
 //プレイヤーの座標更新
@@ -131,16 +162,16 @@ function updatePlayer(){
 function updateDog(){
     if(dogState === "walk"){
         if(dogDirection === 0){
-        dogX += 3;
+        dogX += 4;
         }
         if(dogDirection === 1){
-            dogX -= 3;
+            dogX -= 4;
         }
         if(dogDirection === 2){
-            dogY -= 3;
+            dogY -= 4;
         }
         if(dogDirection === 3){
-            dogY += 3;
+            dogY += 4;
         }
    
 
@@ -171,13 +202,13 @@ function updateDog(){
         if(dogTimer >= dogPeriod){
             dogState = "rest";
             hasPooped = false;
-            willPoop = Math.random() < 0.8;
+            willPoop = true;
 
             dogAnimationFrame = 0;
             dogAnimationTimer = 0;
             dogTimer = 0;
             dogDirection = Math.floor(Math.random() * 4);
-            dogPeriod = Math.floor(Math.random() * 180 + 120);
+            dogPeriod = Math.floor(Math.random() * 90 + 120);
         }
     }
     
@@ -206,9 +237,39 @@ function isNearPoop(poop){
     return distance <= 50;
 }
 
+function restartGame(){
+    playerX = 100;
+    playerY = 100;
+    keys = {};
+    dogX = 200;
+    dogY = 100;
+    dogDirection = 0;
+    dogTimer = 0;
+    dogPeriod = 120;
+    dogRestTimer = 0;
+    dogRestPeriod = 120;
+    dogState = "walk";
+    willPoop = false;
+    poops = [];
+    hasPooped = false;
+    dirtiness = 0;
+    elapsedTime = 0;
+    isGameOver = false;
+    dogAnimationTimer = 0;
+    dogAnimationFrame = 0;
+
+    cancelAnimationFrame(animationId);
+    animationId = requestAnimationFrame(gameLoop);
+}
+
 function gameLoop(){
+    if(!isGameStarted){
+        return;
+    }
+
     if(isGameOver){
         drawGameOver();
+        drawResult();
         return;
     }
     
@@ -219,14 +280,14 @@ function gameLoop(){
     drawDog();
     drawPoops();
     drawDirtiness();
+    drawElapsedTime();
 
+    elapsedTime += 1/60;
     dirtiness += poops.length / 30;
     if(dirtiness >= 100){
         isGameOver = true;
     }
 
-    requestAnimationFrame(gameLoop);    
+    animationId = requestAnimationFrame(gameLoop);    
 }
-
-gameLoop();
 

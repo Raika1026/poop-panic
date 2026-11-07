@@ -7,8 +7,17 @@
 </head>
 <body>
     <h1>めんちパニック！</h1>
-
-    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    
+    <div id="gameArea">
+        <div>
+            メンチ君は立ち止まると必ずウンチ君をします<br>
+            ウンチ君が存在している間は汚れゲージが増加します<br>
+            スペースキーを3回押して、素早くウンチ君を処理しましょう
+        </div>
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <button id="startButton">ゲームスタート</button>
+        <button id="restartButton">もう一度遊ぶ</button>
+    </div>
 
     <script src="script.js"></script>
 </body>
